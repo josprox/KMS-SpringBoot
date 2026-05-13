@@ -23,9 +23,12 @@
         
         .chart-container { 
             padding: 1.5rem; 
-            min-height: 300px; 
-            display: flex;
-            flex-direction: column;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
 
         @media (max-width: 768px) {
@@ -63,11 +66,15 @@
         <div class="charts-grid">
             <div class="glass-card chart-container">
                 <h3 style="margin: 0 0 1rem 0; font-size: 1rem;">Activation History</h3>
-                <canvas id="dailyChart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="dailyChart"></canvas>
+                </div>
             </div>
             <div class="glass-card chart-container">
                 <h3 style="margin: 0 0 1rem 0; font-size: 1rem;">Software Distribution</h3>
-                <canvas id="softwareChart"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="softwareChart"></canvas>
+                </div>
             </div>
         </div>
 
