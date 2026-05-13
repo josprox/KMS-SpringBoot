@@ -31,7 +31,11 @@ COPY --from=app-builder /app/build/libs/*.jar app.jar
 # Environment variables
 ENV KMS_VLMCSD_PATH=/usr/local/bin/vlmcsd
 
+# Copy entrypoint script
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
 # Dashboard and KMS unified port
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["./entrypoint.sh"]

@@ -10,10 +10,10 @@ data class AdminUser(
     val id: Long? = null,
 
     @Column(unique = true, nullable = false)
-    val username: String,
+    val username: String = "",
 
     @Column(nullable = false)
-    val passwordHash: String,
+    val passwordHash: String = "",
 
     @Column(nullable = false)
     val role: String = "ROLE_ADMIN"

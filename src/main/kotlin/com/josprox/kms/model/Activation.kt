@@ -11,13 +11,13 @@ data class Activation(
     val id: Long? = null,
 
     @Column(nullable = false)
-    val machineName: String,
+    val machineName: String = "",
 
     @Column(nullable = false)
-    val ipAddress: String,
+    val ipAddress: String = "",
 
     @Column(nullable = false)
-    val softwareName: String,
+    val softwareName: String = "",
 
     @Column(nullable = false)
     val activationDate: LocalDateTime = LocalDateTime.now(),

@@ -45,7 +45,8 @@ class SecurityConfig(private val adminUserRepository: AdminUserRepository) {
     fun userDetailsService(): UserDetailsService {
         return UserDetailsService { username ->
             val adminUser = adminUserRepository.findByUsername(username)
-                ?: throw UsernameNotFoundException("User not found")
+            println("Login attempt for user: $username - Found in DB: ${adminUser != null}")
+            adminUser ?: throw UsernameNotFoundException("User not found")
             
             User.withUsername(adminUser.username)
                 .password(adminUser.passwordHash)
