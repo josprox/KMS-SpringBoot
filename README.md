@@ -1,75 +1,128 @@
-# KMS Corporate Management System
+# 🚀 KMS Corporate Management System
 
-Este proyecto es una solución integral para la gestión de activaciones KMS (Key Management Service) en entornos corporativos. Combina un emulador de KMS (`vlmcsd`) con una potente interfaz de administración construida en **Spring Boot** y **Kotlin**.
+[![Spring Boot](https://img.shields.io/badge/Spring--Boot-4.0.6-brightgreen)](https://spring.io/projects/spring-boot)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.x-blue)](https://kotlinlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](https://www.docker.com/)
 
-## Características
+> [!CAUTION]
+> **⚠️ DESCARGO DE RESPONSABILIDAD**: Este proyecto ha sido desarrollado exclusivamente con fines **educativos, de investigación y de prueba** en entornos controlados. El autor no se hace responsable del uso indebido de esta herramienta. Se recomienda cumplir siempre con los términos de licencia de software de los proveedores correspondientes.
 
-- **Puerto Unificado**: Todo el sistema funciona bajo un solo puerto (por defecto 8080). El sistema detecta automáticamente si el tráfico es Web (HTTP) o de Activación (KMS).
-- **Dashboard Premium**: Interfaz moderna con *Glassmorphism* para monitorear activaciones y estadísticas.
-- **Seguridad Robusta**: Sistema de login para administradores con BCrypt.
-- **Base de Datos Flexible**: Usa Spring Data JPA con PostgreSQL, incluyendo migraciones automáticas con Flyway.
-- **Dockerizado**: Un solo contenedor que compila y ejecuta todo el stack.
+Una solución integral y moderna para la gestión de activaciones KMS corporativas. Este sistema combina la potencia del emulador `vlmcsd` con un Dashboard administrativo premium bajo una arquitectura de **puerto unificado**.
 
-## Requisitos Previos
+---
 
-- Docker y Docker Compose (opcional para despliegue).
-- Java 21 (si se corre localmente).
-- PostgreSQL.
+## 🧠 ¿Cómo funciona? (Arquitectura)
 
-## Setup & Despliegue
+A diferencia de otros servidores KMS, este sistema utiliza un **TCP Multiplexer** avanzado que permite que todo funcione bajo el puerto **8080**:
 
-Sigue estos pasos para un despliegue exitoso en entornos de nube (como Oracle Cloud) usando Dokploy.
+```mermaid
+graph TD
+    A[Cliente: Puerto 8080] --> B{Multiplexor Inteligente}
+    B -- ¿Es tráfico HTTP? --> C[Dashboard Web - Puerto 8081]
+    B -- ¿Es tráfico Binario/RPC? --> D[Emulador KMS - Puerto 1688]
+    D --> E[Lector de Logs]
+    E --> F[(Base de Datos PostgreSQL)]
+    F --> C
+```
 
-### 1. Configuración de Red (Oracle Cloud / VPS)
-El sistema KMS utiliza el puerto **1688 (TCP)**. Debes abrirlo en tu firewall:
-- **Consola de Oracle Cloud**: Añade una "Ingress Rule" para el puerto `1688` (TCP) desde `0.0.0.0/0`.
-- **Servidor (Firewall interno)**: Ejecuta los siguientes comandos para permitir el tráfico:
+1.  **Tráfico Web**: Si entras desde un navegador, el sistema detecta HTTP y te muestra el **Dashboard**.
+2.  **Tráfico de Activación**: Si Windows o Office intentan activarse, el sistema detecta tráfico KMS y lo redirige al emulador interno.
+3.  **Monitoreo**: Un servicio inteligente lee los logs del emulador en tiempo real y guarda cada activación exitosa en la base de datos.
+
+---
+
+## 🌐 Esquema de Conectividad y Puertos
+
+Para que el sistema sea accesible desde el exterior, la red debe estar configurada siguiendo este esquema:
+
+```mermaid
+graph LR
+    User((Usuario)) -- Puerto 443 --> CF{Cloudflare Proxy}
+    CF -- HTTP --> Dokploy[Dokploy Proxy]
+    Dokploy --> App[KMS App: 8080]
+    
+    PC((Windows Client)) -- Puerto 1688 --> Oracle[Oracle Cloud Firewall]
+    Oracle -- TCP --> App
+    
+    subgraph "Configuración Correcta"
+    App
+    end
+```
+
+> [!IMPORTANT]
+> **⚠️ REGLA DE ORO**: Para la activación (puerto 1688), el tráfico **NO** puede pasar por el proxy de Cloudflare. Debe ir directo del cliente al firewall de tu VPS.
+
+---
+
+## ✨ Características Principales
+
+- 🪟 **Dashboard Glassmorphism**: Visualización de datos con gráficas interactivas (Chart.js).
+- 🛡️ **Seguridad Corporativa**: Acceso protegido con Spring Security y BCrypt.
+- 🔄 **Log Sniffing**: Captura automática de nombre de máquina y tipo de software.
+- 📦 **Docker Unified**: Un solo contenedor para App y Emulador.
+- 🚀 **Despliegue Rápido**: Totalmente compatible con Dokploy y entornos de nube.
+
+---
+
+## 🛠️ Guía de Setup (Paso a Paso)
+
+### 1. Preparación de la Nube (Oracle Cloud / VPS)
+El sistema utiliza el puerto **1688 (TCP)** para las activaciones externas.
+- **Firewall de la Nube**: Abre el puerto `1688` en las reglas de entrada (Ingress Rules) de tu red virtual.
+- **Firewall del Sistema**: Ejecuta estos comandos vía SSH:
   ```bash
   sudo iptables -I INPUT -p tcp --dport 1688 -j ACCEPT
   sudo netfilter-persistent save
   ```
 
-### 2. Configuración en Dokploy
-1.  **Variables de Entorno**: Configura todas las variables del `.env` en la pestaña "Environment" de tu aplicación en Dokploy.
-2.  **Mapeo de Puertos**: En la sección de "Ports", añade el siguiente mapeo:
-    - **Published Port**: `1688`
-    - **Target Port**: `8080`
-    - **Protocol**: `TCP`
-3.  **Despliegue**: El sistema generará automáticamente un archivo `.env` interno basado en tus variables de Dokploy.
+### 2. Configuración en Dokploy / Docker
+1.  **Variables de Entorno**: Configura en tu panel de control:
+    - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+    - `ADMIN_USERNAME`, `ADMIN_PASSWORD` (Para tu acceso al Dashboard)
+2.  **Mapeo de Puertos**: Añade el siguiente mapeo:
+    - `Published: 1688` -> `Target: 8080` (Protocolo: TCP)
+3.  **Dominio**: Configura tu dominio apuntando al puerto `8081` interno (HTTP).
 
-### 3. DNS y Cloudflare (IMPORTANTE)
-Si usas Cloudflare para gestionar tu dominio (`kms.joss.red`):
-- **MODO DNS ONLY**: El registro de tipo A para tu subdominio **DEBE** estar en modo "Nube Gris" (DNS Only).
-- **¿Por qué?**: El proxy de Cloudflare (Nube Naranja) solo soporta tráfico HTTP/HTTPS y bloqueará la conexión KMS de Windows.
+> [!IMPORTANT]
+> **Cloudflare Warning**: Si usas Cloudflare, el registro DNS **DEBE ESTAR EN MODO DNS ONLY** (Nube Gris). El proxy de Cloudflare no es compatible con el protocolo KMS.
 
 ---
 
-## Guía de Activación
+## 🔑 Guía de Activación
 
-Una vez que el servidor esté corriendo, usa estos comandos en una terminal como **Administrador**:
-
-### Windows 10/11 Pro
+### 💻 Windows 10 / 11 Pro
+Ejecuta como Administrador:
 ```powershell
-slmgr.vbs /upk
 slmgr.vbs /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX
-slmgr.vbs /skms kms.joss.red
+slmgr.vbs /skms tu-dominio.com
 slmgr.vbs /ato
 ```
 
-### Office (LTSC / Volume)
-*Navega a la carpeta de instalación de Office (ej. `C:\Program Files\Microsoft Office\Office16`)*
+### 📂 Microsoft Office (LTSC / Volume)
+Navega a la carpeta de Office (ej: `C:\Program Files\Microsoft Office\Office16`):
 ```powershell
-cscript ospp.vbs /sethst:kms.joss.red
+cscript ospp.vbs /sethst:tu-dominio.com
 cscript ospp.vbs /act
 ```
 
-## Estructura del Proyecto
+---
 
-- `src/main/kotlin`: Lógica de la aplicación Spring Boot.
-- `src/main/resources`: Plantillas HTML (Thymeleaf), CSS y archivos de migración (SQL).
-- `entrypoint.sh`: Script de arranque que genera el `.env` dinámicamente en producción.
-- `TcpMultiplexerService.kt`: El "cerebro" que permite que la Web y el KMS compartan el mismo puerto.
+## 📊 Dashboard Administrativo
 
-## Licencia
+Accede vía `https://tu-dominio.com` para ver:
+- **Estadísticas Globales**: Total de activaciones y estado del sistema.
+- **Gráfica de Historial**: Tendencia de activaciones por día.
+- **Distribución**: Qué software se activa más (Windows vs Office).
+- **Logs Detallados**: Nombre de la máquina, software y fecha exacta.
 
-Este proyecto es para uso corporativo interno.
+---
+
+## 🛠️ Desarrollo y Estructura
+
+- `src/main/kotlin`: Lógica central en Kotlin.
+- `src/main/resources`: UI con Thymeleaf y CSS moderno.
+- `TcpMultiplexerService.kt`: El selector inteligente de tráfico.
+- `KmsEmulatorService.kt`: El motor de escucha y persistencia de activaciones.
+
+---
+Desarrollado con fines educativos y de investigación. 🛡️
