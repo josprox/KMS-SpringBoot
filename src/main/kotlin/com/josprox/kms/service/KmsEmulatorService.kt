@@ -49,29 +49,47 @@ class KmsEmulatorService(private val activationRepository: ActivationRepository)
         }
     }
 
-    private fun parseAndSaveActivation(line: String) {
-        // Example: 2026-05-13 04:05:08: KMS request from 192.168.1.1 for Windows 10 Pro
-        // Note: Actual vlmcsd output varies, this is a heuristic approach
-        if (line.contains("KMS request from") || line.contains("RPC request:")) {
-            try {
-                val ipMatch = Regex("""(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})""").find(line)
-                val ip = ipMatch?.value ?: "Unknown"
-                
-                var software = "Windows/Office"
-                if (line.contains("Windows", ignoreCase = true)) software = "Windows"
-                if (line.contains("Office", ignoreCase = true)) software = "Office"
+    private var tempIp = "Unknown"
+    private var tempMachine = "Unknown"
+    private var tempSoftware = "Windows"
 
+    private fun parseAndSaveActivation(line: String) {
+        val lowerLine = line.lowercase()
+        
+        // 1. Capture IP (though it might be 127.0.0.1 due to multiplexer)
+        if (lowerLine.contains("connection accepted")) {
+            val ipMatch = Regex("""(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})""").find(line)
+            tempIp = ipMatch?.value ?: "Unknown"
+        }
+
+        // 2. Capture Software type
+        if (lowerLine.contains("application id")) {
+            tempSoftware = if (lowerLine.contains("office")) "Office" else "Windows"
+        }
+
+        // 3. Capture real Machine Name (the most important info)
+        if (lowerLine.contains("workstation name")) {
+            tempMachine = line.split(":").lastOrNull()?.trim() ?: "Unknown"
+        }
+
+        // 4. On response sent, persist to database
+        if (lowerLine.contains("sending response")) {
+            try {
                 val activation = Activation(
-                    ipAddress = ip,
-                    machineName = "Remote Client",
-                    softwareName = software,
+                    ipAddress = tempIp,
+                    machineName = tempMachine,
+                    softwareName = tempSoftware,
                     activationDate = LocalDateTime.now(),
                     expiryDate = LocalDateTime.now().plusDays(180)
                 )
                 activationRepository.save(activation)
-                logger.info("New activation recorded: $software from $ip")
+                logger.info(">>> DATABASE SUCCESS: Saved activation for $tempSoftware from $tempMachine")
+                
+                // Reset for next request
+                tempMachine = "Unknown"
+                tempIp = "Unknown"
             } catch (e: Exception) {
-                logger.warn("Failed to parse activation line: $line")
+                logger.error("Failed to save to database: ${e.message}")
             }
         }
     }
