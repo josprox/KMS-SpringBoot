@@ -16,50 +16,59 @@ Este proyecto es una solución integral para la gestión de activaciones KMS (Ke
 - Java 21 (si se corre localmente).
 - PostgreSQL.
 
-## Configuración
+## Setup & Despliegue
 
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+Sigue estos pasos para un despliegue exitoso en entornos de nube (como Oracle Cloud) usando Dokploy.
 
-```env
-# Configuración del Servidor
-PORT=8080
-WEB_PORT=8081
+### 1. Configuración de Red (Oracle Cloud / VPS)
+El sistema KMS utiliza el puerto **1688 (TCP)**. Debes abrirlo en tu firewall:
+- **Consola de Oracle Cloud**: Añade una "Ingress Rule" para el puerto `1688` (TCP) desde `0.0.0.0/0`.
+- **Servidor (Firewall interno)**: Ejecuta los siguientes comandos para permitir el tráfico:
+  ```bash
+  sudo iptables -I INPUT -p tcp --dport 1688 -j ACCEPT
+  sudo netfilter-persistent save
+  ```
 
-# Base de Datos
-DB_HOST=tu-host.com
-DB_PORT=5432
-DB_NAME=nombre_db
-DB_USER=usuario_db
-DB_PASSWORD=tu_password
+### 2. Configuración en Dokploy
+1.  **Variables de Entorno**: Configura todas las variables del `.env` en la pestaña "Environment" de tu aplicación en Dokploy.
+2.  **Mapeo de Puertos**: En la sección de "Ports", añade el siguiente mapeo:
+    - **Published Port**: `1688`
+    - **Target Port**: `8080`
+    - **Protocol**: `TCP`
+3.  **Despliegue**: El sistema generará automáticamente un archivo `.env` interno basado en tus variables de Dokploy.
 
-# Administrador Inicial
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin123
+### 3. DNS y Cloudflare (IMPORTANTE)
+Si usas Cloudflare para gestionar tu dominio (`kms.joss.red`):
+- **MODO DNS ONLY**: El registro de tipo A para tu subdominio **DEBE** estar en modo "Nube Gris" (DNS Only).
+- **¿Por qué?**: El proxy de Cloudflare (Nube Naranja) solo soporta tráfico HTTP/HTTPS y bloqueará la conexión KMS de Windows.
+
+---
+
+## Guía de Activación
+
+Una vez que el servidor esté corriendo, usa estos comandos en una terminal como **Administrador**:
+
+### Windows 10/11 Pro
+```powershell
+slmgr.vbs /upk
+slmgr.vbs /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX
+slmgr.vbs /skms kms.joss.red
+slmgr.vbs /ato
 ```
 
-## Despliegue con Docker
-
-Para construir y levantar el sistema completo en un solo contenedor:
-
-```bash
-docker build -t kms-corporate .
-docker run -p 8080:8080 --env-file .env kms-corporate
+### Office (LTSC / Volume)
+*Navega a la carpeta de instalación de Office (ej. `C:\Program Files\Microsoft Office\Office16`)*
+```powershell
+cscript ospp.vbs /sethst:kms.joss.red
+cscript ospp.vbs /act
 ```
 
 ## Estructura del Proyecto
 
 - `src/main/kotlin`: Lógica de la aplicación Spring Boot.
 - `src/main/resources`: Plantillas HTML (Thymeleaf), CSS y archivos de migración (SQL).
-- `docker-vlmcsd`: Código fuente y Dockerfile del emulador KMS.
+- `entrypoint.sh`: Script de arranque que genera el `.env` dinámicamente en producción.
 - `TcpMultiplexerService.kt`: El "cerebro" que permite que la Web y el KMS compartan el mismo puerto.
-
-## API de Registro
-
-Puedes registrar activaciones manualmente o desde scripts externos:
-
-```bash
-curl -X POST "http://localhost:8080/api/v1/register-activation?machineName=PC-CONTABILIDAD&ipAddress=10.0.0.5&softwareName=Office+2021"
-```
 
 ## Licencia
 
