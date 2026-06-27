@@ -13,11 +13,11 @@ Una solución integral y moderna para la gestión de activaciones KMS corporativ
 
 ## 🧠 ¿Cómo funciona? (Arquitectura)
 
-A diferencia de otros servidores KMS, este sistema utiliza un **TCP Multiplexer** avanzado que permite que todo funcione bajo el puerto **8080**:
+A diferencia de otros servidores KMS, este sistema utiliza un **TCP Multiplexer** avanzado que permite que todo funcione bajo el puerto **80**:
 
 ```mermaid
 graph TD
-    A[Cliente: Puerto 8080] --> B{Multiplexor Inteligente}
+    A[Cliente: Puerto 80] --> B{Multiplexor Inteligente}
     B -- ¿Es tráfico HTTP? --> C[Dashboard Web - Puerto 8081]
     B -- ¿Es tráfico Binario/RPC? --> D[Emulador KMS - Puerto 1688]
     D --> E[Lector de Logs]
@@ -39,7 +39,7 @@ Para que el sistema sea accesible desde el exterior, la red debe estar configura
 graph LR
     User((Usuario)) -- Puerto 443 --> CF{Cloudflare Proxy}
     CF -- HTTP --> Dokploy[Dokploy Proxy]
-    Dokploy --> App[KMS App: 8080]
+    Dokploy --> App[KMS App: 80]
     
     PC((Windows Client)) -- Puerto 1688 --> Oracle[Oracle Cloud Firewall]
     Oracle -- TCP --> App
@@ -80,7 +80,8 @@ El sistema utiliza el puerto **1688 (TCP)** para las activaciones externas.
     - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
     - `ADMIN_USERNAME`, `ADMIN_PASSWORD` (Para tu acceso al Dashboard)
 2.  **Mapeo de Puertos**: Añade el siguiente mapeo:
-    - `Published: 1688` -> `Target: 8080` (Protocolo: TCP)
+    - `Published: 1688` -> `Target: 80` (Protocolo: TCP)
+    O directamente `80:80` para tráfico HTTP.
 3.  **Dominio**: Configura tu dominio apuntando al puerto `8081` interno (HTTP).
 
 > [!IMPORTANT]

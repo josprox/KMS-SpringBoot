@@ -1,7 +1,7 @@
 server:
   port: ${WEB_PORT:8081}
 kms:
-  public-port: ${PORT:8080}
+  public-port: ${PORT:80}
   internal-kms-port: 1688
 spring:
   application:

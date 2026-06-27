@@ -36,6 +36,6 @@ COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
 # Dashboard and KMS unified port
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT ["./entrypoint.sh"]

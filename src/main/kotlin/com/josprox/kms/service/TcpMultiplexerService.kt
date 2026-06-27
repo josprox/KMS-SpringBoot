@@ -17,8 +17,8 @@ class TcpMultiplexerService {
     private val executor = Executors.newCachedThreadPool()
     private var serverSocket: ServerSocket? = null
 
-    @Value("\${kms.public-port:8080}")
-    private var publicPort: Int = 8080
+    @Value("\${kms.public-port:80}")
+    private var publicPort: Int = 80
 
     @Value("\${server.port:8081}")
     private var webPort: Int = 8081

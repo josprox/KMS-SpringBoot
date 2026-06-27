@@ -3,109 +3,162 @@
 <head>
     <title>Dashboard - KMS Admin</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { align-items: flex-start; padding: 2rem; }
-        .dashboard-container { width: 100%; max-width: 1200px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-card { padding: 1.5rem; }
-        .stat-value { font-size: 2rem; font-weight: 700; margin-top: 0.5rem; }
-        
-        .charts-grid { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr; 
-            gap: 1.5rem; 
-            margin-bottom: 2rem; 
-        }
-        
-        .chart-container { 
-            padding: 1.5rem; 
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-
-        @media (max-width: 768px) {
-            .charts-grid { grid-template-columns: 1fr; }
-        }
-    </style>
 </head>
-<body>
+<body class="dashboard-body">
     <div class="dashboard-container">
+        <!-- Header -->
         <div class="header">
             <div>
                 <h1 style="margin: 0;">KMS Management</h1>
-                <p style="color: var(--text-muted);">Monitoring corporate activations</p>
+                <p style="color: var(--text-muted); margin-top: 0.25rem;">Monitoring corporate activations</p>
             </div>
             <form th:action="@{/logout}" method="post">
-                <button type="submit" style="width: auto; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);">Sign Out</button>
+                <button type="submit" class="btn" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: none; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
+                    <span>Sign Out</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
             </form>
         </div>
 
+        <!-- Stats Grid -->
         <div class="stats">
+            <!-- Stat Card 1 -->
             <div class="glass-card stat-card">
-                <div style="color: var(--text-muted); font-size: 0.875rem;">Total Activations</div>
-                <div class="stat-value" th:text="${totalActivations}">0</div>
+                <div class="stat-info">
+                    <span class="stat-title">Total Activations</span>
+                    <span class="stat-value" th:text="${totalActivations}">0</span>
+                </div>
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                        <line x1="6" y1="6" x2="6.01" y2="6"/>
+                        <line x1="6" y1="18" x2="6.01" y2="18"/>
+                    </svg>
+                </div>
             </div>
-            <div class="glass-card stat-card">
-                <div style="color: var(--text-muted); font-size: 0.875rem;">Renewal Cycle</div>
-                <div class="stat-value">180 Days</div>
+            
+            <!-- Stat Card 2 -->
+            <div class="glass-card stat-card stat-warning">
+                <div class="stat-info">
+                    <span class="stat-title">Renewal Cycle</span>
+                    <span class="stat-value">180 Days</span>
+                </div>
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
             </div>
-            <div class="glass-card stat-card">
-                <div style="color: var(--text-muted); font-size: 0.875rem;">System Status</div>
-                <div class="stat-value" style="color: #4ade80;">Active</div>
+            
+            <!-- Stat Card 3 -->
+            <div class="glass-card stat-card stat-active">
+                <div class="stat-info">
+                    <span class="stat-title">System Status</span>
+                    <span class="stat-value" style="color: var(--color-success);">Active</span>
+                </div>
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
             </div>
         </div>
 
+        <!-- Charts Grid -->
         <div class="charts-grid">
             <div class="glass-card chart-container">
-                <h3 style="margin: 0 0 1rem 0; font-size: 1rem;">Activation History</h3>
+                <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; color: #ffffff;">Activation History</h3>
                 <div class="chart-wrapper">
                     <canvas id="dailyChart"></canvas>
                 </div>
             </div>
             <div class="glass-card chart-container">
-                <h3 style="margin: 0 0 1rem 0; font-size: 1rem;">Software Distribution</h3>
+                <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; color: #ffffff;">Software Distribution</h3>
                 <div class="chart-wrapper">
                     <canvas id="softwareChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="glass-card">
-            <h2 style="margin-top: 0; font-size: 1.25rem;">Recent Activations</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Machine Name</th>
-                            <th>IP Address</th>
-                            <th>Software</th>
-                            <th>Activation Date</th>
-                            <th>Expiry Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="act : ${activations}">
-                            <td th:text="${act.machineName}">Machine</td>
-                            <td th:text="${act.ipAddress}">0.0.0.0</td>
-                            <td th:text="${act.softwareName}">Windows 11</td>
-                            <td th:text="${#temporals.format(act.activationDate, 'yyyy-MM-dd HH:mm')}">Date</td>
-                            <td th:text="${#temporals.format(act.expiryDate, 'yyyy-MM-dd HH:mm')}">Date</td>
-                            <td><span class="status-badge status-active">Renewed</span></td>
-                        </tr>
-                        <tr th:if="${activations.empty}">
-                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No activations recorded yet.</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Bottom Grid: Table & Quick Activation Helper -->
+        <div class="dashboard-grid-two-col">
+            <!-- Recent Activations -->
+            <div class="glass-card" style="margin: 0;">
+                <h2 style="margin-top: 0; font-size: 1.25rem; color: #ffffff;">Recent Activations</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Machine Name</th>
+                                <th>IP Address</th>
+                                <th>Software</th>
+                                <th>Activation Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="act : ${activations}">
+                                <td th:text="${act.machineName}" style="font-weight: 600; color: #ffffff;">Machine</td>
+                                <td th:text="${act.ipAddress}">0.0.0.0</td>
+                                <td th:text="${act.softwareName}">Windows 11</td>
+                                <td th:text="${#temporals.format(act.activationDate, 'yyyy-MM-dd HH:mm')}">Date</td>
+                                <td th:text="${#temporals.format(act.expiryDate, 'yyyy-MM-dd HH:mm')}">Date</td>
+                                <td><span class="status-badge status-active">Renewed</span></td>
+                            </tr>
+                            <tr th:if="${activations.empty}">
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem; font-size: 0.95rem;">No activations recorded yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Quick Helper Card -->
+            <div class="glass-card" style="margin: 0; display: flex; flex-direction: column;">
+                <h3 style="margin: 0 0 1rem 0; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem; color: #ffffff;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                        <line x1="6" y1="20" x2="6.01" y2="20"/>
+                        <line x1="10" y1="20" x2="10.01" y2="20"/>
+                        <line x1="14" y1="20" x2="14.01" y2="20"/>
+                        <line x1="18" y1="20" x2="18.01" y2="20"/>
+                    </svg>
+                    Activation Helper
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Select software to generate KMS activation commands.</p>
+                
+                <div style="margin-bottom: 1.25rem;">
+                    <label for="productSelect" style="font-size: 0.75rem; margin-bottom: 0.5rem;">Select Product</label>
+                    <select id="productSelect" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: white; padding: 0.75rem 1rem; border-radius: 0.5rem; width: 100%; font-family: var(--font-body); font-size: 0.9rem; outline: none; cursor: pointer;">
+                        <option value="win11pro" style="background: var(--bg-dark);">Windows 10/11 Pro</option>
+                        <option value="win11ent" style="background: var(--bg-dark);">Windows 10/11 Enterprise</option>
+                        <option value="winserver" style="background: var(--bg-dark);">Windows Server 2022 Standard</option>
+                        <option value="office" style="background: var(--bg-dark);">Office LTSC 2021 (Volume)</option>
+                    </select>
+                </div>
+                
+                <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.04); padding: 1rem; border-radius: 0.50rem; font-family: monospace; font-size: 0.8rem; line-height: 1.5; color: #a855f7; word-break: break-all; margin-bottom: 1.25rem; flex-grow: 1; min-height: 120px;" id="commandDisplay">
+                    <!-- Dynamic Commands Filled Here -->
+                </div>
+                
+                <button id="copyBtn" class="btn" style="width: 100%; font-size: 0.85rem; padding: 0.75rem 1.2rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    <span>Copy Commands</span>
+                </button>
             </div>
         </div>
     </div>
@@ -117,20 +170,72 @@
         const softwareLabels = /*[[${softwareLabels}]]*/ [];
         const softwareData = /*[[${softwareData}]]*/ [];
 
-        // Daily Activations Chart
-        new Chart(document.getElementById('dailyChart'), {
+        // Dynamic Commands Logic
+        const productSelect = document.getElementById('productSelect');
+        const commandDisplay = document.getElementById('commandDisplay');
+        const copyBtn = document.getElementById('copyBtn');
+
+        const keys = {
+            win11pro: 'W269N-WFGWX-YVC9B-4J6C9-T83GX',
+            win11ent: 'NPPR9-FWDCX-D2C8J-H872K-2YT43',
+            winserver: 'VDYBN-27WPP-V4HQT-9V44D-G7C82',
+            office: 'FXYTK-NJJ8C-GB6C6-M8F3B-TYH8Y' // Example LTSC key
+        };
+
+        function updateCommands() {
+            const host = window.location.hostname || 'kms.corporate.local';
+            const val = productSelect.value;
+            const key = keys[val];
+            
+            if (val === 'office') {
+                commandDisplay.innerHTML = `cd "C:\\Program Files\\Microsoft Office\\Office16"<br>cscript ospp.vbs /inpkey:${key}<br>cscript ospp.vbs /sethst:${host}<br>cscript ospp.vbs /act`;
+            } else {
+                commandDisplay.innerHTML = `slmgr.vbs /ipk ${key}<br>slmgr.vbs /skms ${host}<br>slmgr.vbs /ato`;
+            }
+        }
+
+        productSelect.addEventListener('change', updateCommands);
+        window.addEventListener('DOMContentLoaded', updateCommands);
+
+        copyBtn.addEventListener('click', () => {
+            const rawText = commandDisplay.innerText;
+            navigator.clipboard.writeText(rawText).then(() => {
+                const origText = copyBtn.querySelector('span').innerText;
+                copyBtn.querySelector('span').innerText = 'Copied!';
+                copyBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                setTimeout(() => {
+                    copyBtn.querySelector('span').innerText = origText;
+                    copyBtn.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+
+        // Daily Activations Chart with Premium Gradient
+        const ctxDaily = document.getElementById('dailyChart').getContext('2d');
+        const gradientDaily = ctxDaily.createLinearGradient(0, 0, 0, 300);
+        gradientDaily.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
+        gradientDaily.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+        new Chart(ctxDaily, {
             type: 'line',
             data: {
                 labels: dailyLabels,
                 datasets: [{
                     label: 'Activations',
                     data: dailyData,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: '#6366f1',
+                    backgroundColor: gradientDaily,
                     fill: true,
                     tension: 0.4,
                     borderWidth: 3,
-                    pointBackgroundColor: '#3b82f6'
+                    pointBackgroundColor: '#a855f7',
+                    pointBorderColor: '#ffffff',
+                    pointHoverBackgroundColor: '#ffffff',
+                    pointHoverBorderColor: '#a855f7',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
@@ -138,8 +243,15 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: 'rgba(255,255,255,0.05)' }, 
+                        ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } } 
+                    },
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } } 
+                    }
                 }
             }
         });
@@ -151,7 +263,7 @@
                 labels: softwareLabels,
                 datasets: [{
                     data: softwareData,
-                    backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'],
+                    backgroundColor: ['#6366f1', '#a855f7', '#ec4899', '#f59e0b'],
                     borderWidth: 0,
                     hoverOffset: 10
                 }]
@@ -162,10 +274,15 @@
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: '#94a3b8', usePointStyle: true, padding: 20 }
+                        labels: { 
+                            color: '#94a3b8', 
+                            usePointStyle: true, 
+                            padding: 20,
+                            font: { family: 'Plus Jakarta Sans' }
+                        }
                     }
                 },
-                cutout: '70%'
+                cutout: '72%'
             }
         });
         /*]]>*/
