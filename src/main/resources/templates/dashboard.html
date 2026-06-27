@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Dashboard - KMS Admin</title>
+    <title>Panel de Control - Administrador KMS</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,12 +12,12 @@
         <!-- Header -->
         <div class="header">
             <div>
-                <h1 style="margin: 0;">KMS Management</h1>
-                <p style="color: var(--text-muted); margin-top: 0.25rem;">Monitoring corporate activations</p>
+                <h1 style="margin: 0;">Gestión de KMS</h1>
+                <p style="color: var(--text-muted); margin-top: 0.25rem;">Monitoreo de activaciones corporativas</p>
             </div>
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="btn" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: none; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
-                    <span>Sign Out</span>
+                    <span>Cerrar Sesión</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                         <polyline points="16 17 21 12 16 7"/>
@@ -32,7 +32,7 @@
             <!-- Stat Card 1 -->
             <div class="glass-card stat-card">
                 <div class="stat-info">
-                    <span class="stat-title">Total Activations</span>
+                    <span class="stat-title">Activaciones Totales</span>
                     <span class="stat-value" th:text="${totalActivations}">0</span>
                 </div>
                 <div class="stat-icon">
@@ -48,8 +48,8 @@
             <!-- Stat Card 2 -->
             <div class="glass-card stat-card stat-warning">
                 <div class="stat-info">
-                    <span class="stat-title">Renewal Cycle</span>
-                    <span class="stat-value">180 Days</span>
+                    <span class="stat-title">Ciclo de Renovación</span>
+                    <span class="stat-value">180 Días</span>
                 </div>
                 <div class="stat-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -62,8 +62,8 @@
             <!-- Stat Card 3 -->
             <div class="glass-card stat-card stat-active">
                 <div class="stat-info">
-                    <span class="stat-title">System Status</span>
-                    <span class="stat-value" style="color: var(--color-success);">Active</span>
+                    <span class="stat-title">Estado del Sistema</span>
+                    <span class="stat-value" style="color: var(--color-success);">Activo</span>
                 </div>
                 <div class="stat-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -77,13 +77,13 @@
         <!-- Charts Grid -->
         <div class="charts-grid">
             <div class="glass-card chart-container">
-                <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; color: #ffffff;">Activation History</h3>
+                <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; color: #ffffff;">Historial de Activaciones</h3>
                 <div class="chart-wrapper">
                     <canvas id="dailyChart"></canvas>
                 </div>
             </div>
             <div class="glass-card chart-container">
-                <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; color: #ffffff;">Software Distribution</h3>
+                <h3 style="margin: 0 0 1.25rem 0; font-size: 1.1rem; color: #ffffff;">Distribución de Software</h3>
                 <div class="chart-wrapper">
                     <canvas id="softwareChart"></canvas>
                 </div>
@@ -94,17 +94,17 @@
         <div class="dashboard-grid-two-col">
             <!-- Recent Activations -->
             <div class="glass-card" style="margin: 0;">
-                <h2 style="margin-top: 0; font-size: 1.25rem; color: #ffffff;">Recent Activations</h2>
+                <h2 style="margin-top: 0; font-size: 1.25rem; color: #ffffff;">Activaciones Recientes</h2>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Machine Name</th>
-                                <th>IP Address</th>
+                                <th>Nombre de Máquina</th>
+                                <th>Dirección IP</th>
                                 <th>Software</th>
-                                <th>Activation Date</th>
-                                <th>Expiry Date</th>
-                                <th>Status</th>
+                                <th>Fecha de Activación</th>
+                                <th>Fecha de Expiración</th>
+                                <th>Estado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -114,10 +114,10 @@
                                 <td th:text="${act.softwareName}">Windows 11</td>
                                 <td th:text="${#temporals.format(act.activationDate, 'yyyy-MM-dd HH:mm')}">Date</td>
                                 <td th:text="${#temporals.format(act.expiryDate, 'yyyy-MM-dd HH:mm')}">Date</td>
-                                <td><span class="status-badge status-active">Renewed</span></td>
+                                <td><span class="status-badge status-active">Renovado</span></td>
                             </tr>
                             <tr th:if="${activations.empty}">
-                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem; font-size: 0.95rem;">No activations recorded yet.</td>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem; font-size: 0.95rem;">No se han registrado activaciones aún.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -134,17 +134,17 @@
                         <line x1="14" y1="20" x2="14.01" y2="20"/>
                         <line x1="18" y1="20" x2="18.01" y2="20"/>
                     </svg>
-                    Activation Helper
+                    Asistente de Activación
                 </h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Select software to generate KMS activation commands.</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Selecciona el software para generar los comandos de activación KMS.</p>
                 
                 <div style="margin-bottom: 1.25rem;">
-                    <label for="productSelect" style="font-size: 0.75rem; margin-bottom: 0.5rem;">Select Product</label>
+                    <label for="productSelect" style="font-size: 0.75rem; margin-bottom: 0.5rem;">Seleccionar Producto</label>
                     <select id="productSelect" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: white; padding: 0.75rem 1rem; border-radius: 0.5rem; width: 100%; font-family: var(--font-body); font-size: 0.9rem; outline: none; cursor: pointer;">
                         <option value="win11pro" style="background: var(--bg-dark);">Windows 10/11 Pro</option>
                         <option value="win11ent" style="background: var(--bg-dark);">Windows 10/11 Enterprise</option>
                         <option value="winserver" style="background: var(--bg-dark);">Windows Server 2022 Standard</option>
-                        <option value="office" style="background: var(--bg-dark);">Office LTSC 2021 (Volume)</option>
+                        <option value="office" style="background: var(--bg-dark);">Office LTSC 2021 (Volumen)</option>
                     </select>
                 </div>
                 
@@ -157,7 +157,7 @@
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                     </svg>
-                    <span>Copy Commands</span>
+                    <span>Copiar Comandos</span>
                 </button>
             </div>
         </div>
@@ -179,7 +179,7 @@
             win11pro: 'W269N-WFGWX-YVC9B-4J6C9-T83GX',
             win11ent: 'NPPR9-FWDCX-D2C8J-H872K-2YT43',
             winserver: 'VDYBN-27WPP-V4HQT-9V44D-G7C82',
-            office: 'FXYTK-NJJ8C-GB6C6-M8F3B-TYH8Y' // Example LTSC key
+            office: 'FXYTK-NJJ8C-GB6C6-M8F3B-TYH8Y'
         };
 
         function updateCommands() {
@@ -201,7 +201,7 @@
             const rawText = commandDisplay.innerText;
             navigator.clipboard.writeText(rawText).then(() => {
                 const origText = copyBtn.querySelector('span').innerText;
-                copyBtn.querySelector('span').innerText = 'Copied!';
+                copyBtn.querySelector('span').innerText = '¡Copiado!';
                 copyBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
                 setTimeout(() => {
                     copyBtn.querySelector('span').innerText = origText;
@@ -223,7 +223,7 @@
             data: {
                 labels: dailyLabels,
                 datasets: [{
-                    label: 'Activations',
+                    label: 'Activaciones',
                     data: dailyData,
                     borderColor: '#6366f1',
                     backgroundColor: gradientDaily,
